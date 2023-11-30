@@ -55,8 +55,8 @@ class Crawler:
                 break
             else:
                 urlStruct = self.urlQueue.get()
+                self.queueLock.release()
                 #TODO: Get web page, find all elements with the filetype. If find a link, add back with increase level
-            self.queueLock.release()
                         
 class UserInterface:
     def __init__(self):
@@ -80,7 +80,7 @@ class UserInterface:
                                                ft.dropdown.Option(4),
                                                ft.dropdown.Option(5)])
         self.startBtn = ft.ElevatedButton(text="Start",
-                                          on_click=self.startCrawl,
+                                          on_click=self.startCrawl(),
                                           height=50)
         
         self.crawler = Crawler()
