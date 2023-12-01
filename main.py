@@ -57,6 +57,10 @@ class Crawler:
                 urlStruct = self.urlQueue.get()
                 self.queueLock.release()
                 #TODO: Get web page, find all elements with the filetype. If find a link, add back with increase level
+                
+    def getAllFile(self):
+        #TODO: Download all files to Downloads folder 
+        pass
                         
 class UserInterface:
     def __init__(self):
