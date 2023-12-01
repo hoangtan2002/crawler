@@ -92,6 +92,7 @@ class UserInterface:
     
     def startCrawl(self):
         print(f"Start Crawler with URL:{self.urlField.value}, filetype:{self.fileTypeDropdown.value}, with {self.parallelThread.value} Threads and max depth of {self.maxDepth.value}" )
+        #TODO:Start crawling thread
         pass
     
     def main(self,page:ft.Page):
