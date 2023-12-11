@@ -57,6 +57,18 @@ class Crawler:
                 urlStruct = self.urlQueue.get()
                 self.queueLock.release()
                 #TODO: Get web page, find all elements with the filetype. If find a link, add back with increase level
+                try:
+                    response = requests.get(urlStruct.url)
+                    if response.status_code == 200:
+                        soup = BeautifulSoup(response.text, 'html.parser')
+                # Crawl Logic: Get all link
+                    for link in soup.find_all('a', href=True):
+                        new_url = urljoin(urlStruct.url, link['href'])
+                        new_url_struct = urlStruct(new_url, urlStruct.level + 1)
+                        self.urlQueue.put(new_url_struct)
+                except Exception as e:
+                    # Handle exceptions
+                    logging.error(f"Error processing URL {urlStruct.url}: {str(e)}")                
                 
     def getAllFile(self):
         #TODO: Download all files to Downloads folder 
@@ -93,7 +105,8 @@ class UserInterface:
     def startCrawl(self):
         print(f"Start Crawler with URL:{self.urlField.value}, filetype:{self.fileTypeDropdown.value}, with {self.parallelThread.value} Threads and max depth of {self.maxDepth.value}" )
         #TODO:Start crawling thread
-        pass
+        crawler_thread = threading.Thread(target=self.crawler.worker)
+        crawler_thread.start()
     
     def main(self,page:ft.Page):
         page.add(ft.Row([self.urlField,
