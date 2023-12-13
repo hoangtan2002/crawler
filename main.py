@@ -221,9 +221,22 @@ class UserInterface:
                                              text="Download all",
                                              height=50,
                                              disabled=True,
-                                             on_click=self.startDownload)
+                                             on_click=self.startDownload,)
         self.fileListText = ft.Text("Files found:")
-        self.fileList = ft.ListView(expand=1, spacing=10, padding=10, auto_scroll=True)
+        self.fileList = ft.ListView(expand=True,
+                                    spacing=10, 
+                                    padding=10, 
+                                    auto_scroll=True)
+        self.fileListContainer = ft.Container(
+                    content=self.fileList,
+                    margin=10,
+                    padding=10,
+                    width=600,
+                    height=400,
+                    border_radius=10,
+                    ink=True,
+                    border=ft.border.all(1, ft.colors.OUTLINE)
+                )
         self.crawler = Crawler()
         self.userRequest = 0;
         self.workerThread = []
@@ -251,11 +264,6 @@ class UserInterface:
         self.downloadBtn.disabled = False
         self.status.value = "Status: Done"
         self.page.update()
-        self.Row4.controls.append(self.fileListText)
-        self.Row5.controls.append(self.fileList)
-        self.page.add(self.Row4)
-        self.page.add(self.Row5)
-        self.page.update()
         for file in self.crawler.fileCrawled:
             self.fileList.controls.append(ft.Text(disabled=False,
                                                   spans=[ft.TextSpan(file.fileName,
@@ -266,7 +274,7 @@ class UserInterface:
         pass
     
     def clickOnLink(self,e:ft.ControlEvent):
-        pick_files_dialog = ft.FilePicker(on_result=self.downloadAllFiles)
+        pick_files_dialog = ft.FilePicker(on_result=self.downloadSingleFiles)
         self.page.overlay.append(pick_files_dialog)
         self.page.update()
         pick_files_dialog.get_directory_path(dialog_title="Pick a location to save files")
@@ -278,37 +286,46 @@ class UserInterface:
         pick_files_dialog.get_directory_path(dialog_title="Pick a location to save files")
         pass
     
-    def downloadSingelFile(self,e:ft.FilePicker.result):
-        self.status.value = "Status: Downloading files"
-        self.page.update()
-        self.crawler.download(e.path)
-        self.status.value = "Status: Done"
-        self.page.update()
+    def downloadSingleFile(self,e:ft.FilePicker.result):
+        if e.path==None:
+            pass
+        else:
+            self.status.value = "Status: Downloading files"
+            self.page.update()
+            self.crawler.download(e.path)
+            self.status.value = "Status: Done"
+            self.page.update()
         
     def downloadAllFiles(self,e:ft.FilePicker.result):
-        self.status.value = "Status: Downloading files"
-        self.page.update()
-        self.crawler.getAllFile(e.path)
-        self.status.value = "Status: Done"
-        self.page.update()
-    
+        if e.path==None:
+            pass
+        else:
+            self.status.value = "Status: Downloading files"
+            self.page.update()
+            self.crawler.getAllFile(e.path)
+            self.status.value = "Status: Done"
+            self.page.update()
+        
     def main(self,page:ft.Page):
         self.page = page
+        self.page.title = "Crawler"
         self.page.window_min_width = 610
         self.page.window_max_width = 610
-        self.page.window_min_height = 650
+        self.page.window_min_height = 850
         self.Row1 = ft.Row([self.urlField])
         self.Row2 = ft.Row([self.fileTypeDropdown,
                             self.parallelThread,
                             self.maxDepth])
         self.Row3 = ft.Row([self.startBtn,
-                            self.downloadBtn,
-                            self.status])
-        self.Row4 = ft.Row([])
-        self.Row5 = ft.Row([])
-        page.add(self.Row1,
-                 self.Row2,
-                 self.Row3)
-        
+                            self.downloadBtn])
+        self.Row4 = ft.Row([self.fileListText])
+        self.Row5 = ft.Row([self.status])
+        self.page.add(self.Row1,
+                      self.Row2,
+                      self.Row3,
+                      self.Row4,
+                      self.fileListContainer,
+                      self.Row5)
+                
 ui=UserInterface()
 app = ft.app(target=ui.main)
