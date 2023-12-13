@@ -128,7 +128,7 @@ class Crawler:
                                 src = element['src']
                                 if src.endswith(fileType):
                                     numOfFiles+=1
-                                    self.addFile(fileStruct(Path(src).name,src))
+                                    self.addFile(fileStruct(Path(src).name,urljoin(urlStruct.url, src)))
                                     
                         elif fileType == '.mp3':
                             for element in soup.find_all('audio',src=True):
@@ -220,6 +220,8 @@ class UserInterface:
                                              height=50,
                                              disabled=True,
                                              on_click=self.startDownload)
+        self.fileListText = ft.Text("Files found:")
+        self.fileList = ft.ListView(expand=1, spacing=10, padding=10, auto_scroll=True)
         self.crawler = Crawler()
         self.userRequest = 0;
         self.workerThread = []
@@ -245,28 +247,54 @@ class UserInterface:
         print("All thread complete")
         self.startBtn.disabled = False 
         self.downloadBtn.disabled = False
-        self.status.value = "Status: Done Crawling"
+        self.status.value = "Status: Done"
         self.page.update()
+        self.Row4.controls.append(self.fileListText)
+        self.Row5.controls.append(self.fileList)
+        self.page.add(self.Row4)
+        self.page.add(self.Row5)
+        self.page.update()
+        for file in self.crawler.fileCrawled:
+            self.fileList.controls.append(ft.Text(disabled=False,
+                                                  spans=[ft.TextSpan(file.fileName,
+                                                                    ft.TextStyle(decoration=ft.TextDecoration.UNDERLINE),
+                                                                    url=file.url,
+                                                                    on_click=self.clickOnLink)]))
+            self.page.update()
         pass
     
-    def startDownload(self,e):
-        pick_files_dialog = ft.FilePicker(on_result=self.downloadFiles)
+    def clickOnLink(self,e:ft.ControlEvent):
+        pick_files_dialog = ft.FilePicker(on_result=self.downloadAllFiles)
+        self.page.overlay.append(pick_files_dialog)
+        self.page.update()
+        pick_files_dialog.get_directory_path(dialog_title="Pick a location to save files")
+        
+    def startDownload(self,e:ft.ControlEvent):
+        pick_files_dialog = ft.FilePicker(on_result=self.downloadAllFiles)
         self.page.overlay.append(pick_files_dialog)
         self.page.update()
         pick_files_dialog.get_directory_path(dialog_title="Pick a location to save files")
         pass
     
-    def downloadFiles(self,e:ft.FilePicker.result):
+    def downloadSingelFile(self,e:ft.FilePicker.result):
+        self.status.value = "Status: Downloading files"
+        self.page.update()
+        self.crawler.download(e.path)
+        self.status.value = "Status: Done"
+        self.page.update()
+        
+    def downloadAllFiles(self,e:ft.FilePicker.result):
         self.status.value = "Status: Downloading files"
         self.page.update()
         self.crawler.getAllFile(e.path)
-        self.status.value = "Status: Done downloading "
+        self.status.value = "Status: Done"
         self.page.update()
     
     def main(self,page:ft.Page):
         self.page = page
-        self.page.window_min_height = 600
         self.page.window_min_width = 610
+        self.page.window_max_width = 610
+        self.page.window_min_height = 650
         self.Row1 = ft.Row([self.urlField])
         self.Row2 = ft.Row([self.fileTypeDropdown,
                             self.parallelThread,
@@ -274,6 +302,8 @@ class UserInterface:
         self.Row3 = ft.Row([self.startBtn,
                             self.downloadBtn,
                             self.status])
+        self.Row4 = ft.Row([])
+        self.Row5 = ft.Row([])
         page.add(self.Row1,
                  self.Row2,
                  self.Row3)
