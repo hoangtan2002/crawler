@@ -201,7 +201,8 @@ class UserInterface:
                                           width=200,
                                           options = [ft.dropdown.Option(1),
                                                      ft.dropdown.Option(5),
-                                                     ft.dropdown.Option(10)])
+                                                     ft.dropdown.Option(10),
+                                                     ft.dropdown.Option(20)])
         self.maxDepth = ft.Dropdown(label = "Depth", 
                                     width=100,
                                     options = [ft.dropdown.Option(0),
