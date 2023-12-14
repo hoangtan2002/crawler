@@ -229,11 +229,11 @@ class UserInterface:
                                     auto_scroll=True)
         self.fileListContainer = ft.Container(
                     content=self.fileList,
-                    margin=10,
+                    margin=5,
                     padding=10,
                     width=600,
                     height=400,
-                    border_radius=10,
+                    border_radius=5,
                     ink=True,
                     border=ft.border.all(1, ft.colors.OUTLINE)
                 )
@@ -268,13 +268,12 @@ class UserInterface:
             self.fileList.controls.append(ft.Text(disabled=False,
                                                   spans=[ft.TextSpan(file.fileName,
                                                                     ft.TextStyle(decoration=ft.TextDecoration.UNDERLINE),
-                                                                    url=file.url,
-                                                                    on_click=self.clickOnLink)]))
+                                                                    on_click=lambda e:self.clickOnLink(e=e,url=file.url))]))
             self.page.update()
         pass
     
-    def clickOnLink(self,e:ft.ControlEvent):
-        pick_files_dialog = ft.FilePicker(on_result=self.downloadSingleFiles)
+    def clickOnLink(self,e:ft.ControlEvent,url):
+        pick_files_dialog = ft.FilePicker(on_result=lambda e:self.downloadSingleFile(e=e,url=url))
         self.page.overlay.append(pick_files_dialog)
         self.page.update()
         pick_files_dialog.get_directory_path(dialog_title="Pick a location to save files")
@@ -286,13 +285,13 @@ class UserInterface:
         pick_files_dialog.get_directory_path(dialog_title="Pick a location to save files")
         pass
     
-    def downloadSingleFile(self,e:ft.FilePicker.result):
+    def downloadSingleFile(self,e:ft.FilePicker.result,url:str):
         if e.path==None:
             pass
         else:
             self.status.value = "Status: Downloading files"
             self.page.update()
-            self.crawler.download(e.path)
+            self.crawler.download(dest=e.path,url=url)
             self.status.value = "Status: Done"
             self.page.update()
         
