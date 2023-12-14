@@ -247,6 +247,7 @@ class UserInterface:
         #TODO:Start crawling thread
         self.crawler.addSite(self.urlField.value,0)
         self.status.value = "Status: Crawling"
+        self.workerThread = []
         self.startBtn.disabled = True
         self.page.update()
         threadId = range(int(self.parallelThread.value))
