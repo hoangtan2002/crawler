@@ -1,6 +1,4 @@
 beautifulsoup4==4.6.3
-flet==0.15.0
 Requests==2.32.2
 flet==0.25.1
-Requests==2.31.0
 tld==0.13
