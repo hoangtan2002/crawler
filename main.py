@@ -236,7 +236,7 @@ class UserInterface:
                     height=400,
                     border_radius=5,
                     ink=True,
-                    border=ft.border.all(1, ft.colors.OUTLINE)
+                    border=ft.border.all(1, ft.Colors.OUTLINE)
                 )
         self.crawler = Crawler()
         self.userRequest = 0;
@@ -310,9 +310,11 @@ class UserInterface:
     def main(self,page:ft.Page):
         self.page = page
         self.page.title = "Crawler"
-        self.page.window_min_width = 610
-        self.page.window_max_width = 610
-        self.page.window_min_height = 850
+        # self.page.window.min_width = 610
+        # self.page.window.max_width = 610
+        # self.page.window.min_height = 850
+        self.page.window.width=540
+        self.page.window.height=800
         self.Row1 = ft.Row([self.urlField])
         self.Row2 = ft.Row([self.fileTypeDropdown,
                             self.parallelThread,
